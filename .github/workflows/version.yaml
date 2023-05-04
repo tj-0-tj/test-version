@@ -1,22 +1,19 @@
-name: Repository Version
-
-
+# example 1: on push to master
+name: Bump version
 on:
   push:
-    branches: [ main ]
-    paths-ignore: [ "VERSION" ]
-
-
+    branches:
+      - master
 jobs:
-  version:
-    name: Create/update the new repository version
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: '0'
-          ref: main
-      - name: Handle the repository version
-        uses: ./.github/workflows/actions/semver
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.61.0 # Don't use @master unless you're happy to test the latest version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
