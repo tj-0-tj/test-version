@@ -17,6 +17,6 @@ jobs:
           fetch-depth: '0'
           ref: main
       - name: Handle the repository version
-        uses: ./actions/semver
+        uses: ./.github/workflows/actions/semver
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
