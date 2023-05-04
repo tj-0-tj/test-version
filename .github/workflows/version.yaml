@@ -6,6 +6,7 @@ on:
       - main
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
