@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - main
+concurrency: production
 jobs:
-  build:
+  bump-version:
     permissions: write-all
     runs-on: ubuntu-22.04
     steps:
