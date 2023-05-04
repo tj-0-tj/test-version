@@ -1,0 +1,58 @@
+name: Repository Versioning
+description: Create/increment a repository version
+
+
+inputs:
+  version_file:
+    required: false
+    default: VERSION
+  default_bump:
+    required: false
+    type: string
+    default: patch
+  commit_version_file:
+    required: false
+    type: boolean
+    default: true
+
+
+outputs:
+  new-version:
+    value: ${{ steps.tag.outputs.new_tag }}
+
+
+runs:
+  using: composite
+  steps:
+    - name: Generate the new version tag (no commit)
+      uses: anothrNick/github-tag-action@1.61.0
+      id: tag
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: ${{ inputs.default_bump }}
+        DRY_RUN: true
+
+    - name: Update version file
+      if: inputs.commit_version_file == 'true'
+      run: echo '${{ steps.tag.outputs.new_tag }}' | tr -d 'v' > ${{ inputs.version_file }}
+      shell: bash
+
+    - name: Fix .git permissions
+      run: sudo chmod -R ugo+rwX .git
+      shell: bash
+
+    - name: Commit version file
+      if: inputs.commit_version_file == 'true'
+      uses: EndBug/add-and-commit@v8
+      with:
+        add: ${{ inputs.version_file }}
+        default_author: github_actions
+        message: "[gh-action] Updating ${{ inputs.version_file }} file with ${{ steps.tag.outputs.new_tag }}"
+        push: true
+
+    - name: Tag the repo
+      uses: anothrNick/github-tag-action@1.36.0
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        CUSTOM_TAG: ${{ steps.tag.outputs.new_tag }}

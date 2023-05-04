@@ -1,0 +1,22 @@
+name: Repository Version
+
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ "VERSION" ]
+
+
+jobs:
+  version:
+    name: Create/update the new repository version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+          ref: main
+      - name: Handle the repository version
+        uses: ./actions/semver
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
